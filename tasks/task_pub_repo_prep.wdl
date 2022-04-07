@@ -38,6 +38,9 @@ task ncbi_prep_one_sample {
     elif (echo ~{sample_id} | grep -i "CB";)
     then
       ISOLATION_SOURCE="Chicken Breast"
+    elif (echo ~{sample_id} | grep -i "GT";)
+    then
+      ISOLATION_SOURCE="Ground Turkey"
     else
       ISOLATION_SOURCE="error"
     fi
