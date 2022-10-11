@@ -33,22 +33,6 @@ task ncbi_prep_one_sample {
   }
 
   command <<<
-   # if (echo ~{sample_id} | grep -i "GB";)
-   # then
-   #   ISOLATION_SOURCE="Ground Beef"
-   # elif (echo ~{sample_id} | grep -i "CB";)
-   # then
-   #   ISOLATION_SOURCE="Chicken Breast"
-   # elif (echo ~{sample_id} | grep -i "GT";)
-   # then
-   #   ISOLATION_SOURCE="Ground Turkey"
-   # elif (echo ~{sample_id} | grep -i "PC";)
-   # then
-   #   ISOLATION_SOURCE="Pork Chops"
-   # else
-   #   ISOLATION_SOURCE="error"
-   # fi
-
     if (echo ~{sample_id} | grep -i -- "-S";)
     then
       BIOPROJECT_ACCESSION="PRJNA292661"
@@ -62,10 +46,10 @@ task ncbi_prep_one_sample {
     COLLECTION_DATE=($(echo ~{sample_id} | grep -o '[0-9]\+' | tr -d '\n' | head -c 4))
     COLLECTION_DATE=($(echo 20${COLLECTION_DATE:0:2}-${COLLECTION_DATE:2:4}))
     
-    #Format BioSample Attributes
+
     echo -e "*sample_name\tsample_title\tbioproject_accession\t*organism\tstrain\tisolate\t*collected_by\t*collection_date\t*geo_loc_name\t*isolation_source\t*lat_lon\tculture_collection\tgenotype\tpassage_history\tpathotype\tserotype\tserovar\tsubgroup\tsubtype\tdescription" > ~{sample_id}_biosample_attributes.tsv    
     echo -e "~{sample_id}\t\t${BIOPROJECT_ACCESSION}\t~{organism}\t~{sample_id}\t\t~{county_id}\t${COLLECTION_DATE}\t~{geo_loc_name}\t~{isolation_source}\t~{lat_lon}\t\t\t\t\t\t~{serovar}\t\t\t" >> ~{sample_id}_biosample_attributes.tsv    
-    #Format SRA Reads & Metadata
+
     cp ~{read1} ~{sample_id}_R1.fastq.gz
     cp ~{read2} ~{sample_id}_R2.fastq.gz
 

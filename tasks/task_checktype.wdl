@@ -8,8 +8,6 @@
     }
 
     command <<<
-    #SAMPLETYPE = echo ~{organism} | sed 's/ .*//' > ~{sample_id}_sampletype.txt
-
     if (echo ~{sample_id} | grep -i -- "-S";)
     then
       MIN_COV="30"
@@ -19,8 +17,7 @@
     else
       MIN_COV="1000"
     fi
-    echo "~{MIN_COV}" > ~{sample_id}_min_coverage.txt
-
+    echo "${MIN_COV}" > ~{sample_id}_min_coverage.txt
     >>>
 
     output {

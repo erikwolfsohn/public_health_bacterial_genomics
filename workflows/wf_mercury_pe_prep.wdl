@@ -38,20 +38,6 @@ workflow mercury_pe_prep {
     Int n50_value_threshold = 25000
   }
 
-  #command <<<
-  #if (echo ~{sample_id} | grep -i -- "-S";)
-  #  then
-  #    SAMPLETYPE="SALMONELLA"
-  #  elif (echo ~{sample_id} | grep -i -- "-C";)
-  #  then
-  #    SAMPLETYPE="CAMPYLOBACTER"
-  #  else
-  #    SAMPLETYPE="error"
-  #  fi
-
-  #  echo -e "${SAMPLETYPE}" > ~{sample_id}_sampletype.txt
-  #>>>
-
   call checktype.checktype {
     input:
       sample_id = sample_id,
@@ -84,62 +70,6 @@ workflow mercury_pe_prep {
     }
   }
  
-  #  if (n50_value >= n50_value_threshold) {
-  #  if (checktype.sample_type == "Salmonella") {
-  #    if (est_coverage >= 30) {
-  #  call submission_prep.ncbi_prep_one_sample as salm {
-  #    input:
-  #      biosample_accession = biosample_accession,
-  #      filetype = filetype,
-  #      instrument_model = instrument_model,
-  #      library_layout = library_layout,
-  #      library_selection = library_selection,
-  #      library_source = library_source,
-  #      library_strategy = library_strategy,
-  #      organism = organism,
-  #      serovar = serovar,
-  #      read1 = read1,
-  #      read2 = read2,
-  #      seq_platform = seq_platform,
-  #      sample_id = sample_id,
-  #      geo_loc_name = geo_loc_name,
-  #      lat_lon = lat_lon,
-  #      county_id = county_id,
-  #      design_description = design_description,
-  #
-  #      }
-  #    }
-  #  }
-  #}
-  #
-  #  if (n50_value >= n50_value_threshold) {
-  #  if (checktype.sample_type == "Campylobacter") {
-  #    if (est_coverage >= 25) {
-  #  call submission_prep.ncbi_prep_one_sample {
-  #    input:
-  #      biosample_accession = biosample_accession,
-  #      filetype = filetype,
-  #      instrument_model = instrument_model,
-  #      library_layout = library_layout,
-  #      library_selection = library_selection,
-  #      library_source = library_source,
-  #      library_strategy = library_strategy,
-  #      organism = organism,
-  #      serovar = serovar,
-  #      read1 = read1,
-  #      read2 = read2,
-  #      seq_platform = seq_platform,
-  #      sample_id = sample_id,
-  #      geo_loc_name = geo_loc_name,
-  #      lat_lon = lat_lon,
-  #      county_id = county_id,
-  #      design_description = design_description,
-  #
-  #      }
-  #    }
-  #  }
-  #}
-
   call versioning.version_capture{
     input:
   }
