@@ -1,6 +1,6 @@
 version: 1.2
 workflows:
- - name: NARMS_prep_mincoverage_test
+ - name: mercury_pe_prep
    subclass: WDL
    primaryDescriptorPath: /workflows/wf_mercury_pe_prep.wdl
    testParameterFiles:
