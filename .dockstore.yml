@@ -1,62 +1,7 @@
 version: 1.2
 workflows:
- - name: kSNP3
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_ksnp3.wdl
-   testParameterFiles:
-    - empty.json
- - name: Gambit_Query
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_gambit_query.wdl
-   testParameterFiles:
-    - empty.json
- - name: Kleborate
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_kleborate.wdl
-   testParameterFiles:
-    - empty.json
- - name: SerotypeFinder
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_serotypefinder.wdl
-   testParameterFiles:
-    - empty.json
- - name: TBProfiler_Illumina_PE
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_tbprofiler_pe.wdl
-   testParameterFiles:
-    - empty.json
- - name: TBProfiler_ONT
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_tbprofiler_ont.wdl
-   testParameterFiles:
-    - empty.json
- - name: TheiaProk_Illumina_PE_CCPHL
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_theiaprok_illumina_pe.wdl
-   testParameterFiles:
-    - empty.json
- - name: Mercury_PE_Prep_NARMS_CCPHL
+ - name: NARMS_prep_mincoverage_test
    subclass: WDL
    primaryDescriptorPath: /workflows/wf_mercury_pe_prep.wdl
-   testParameterFiles:
-    - empty.json
- - name: MycoSNP_Consensus_Assembly
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_mycosnp_consensus_assembly.wdl
-   testParameterFiles:
-    - empty.json
- - name: MycoSNP_Tree
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_mycosnp_tree.wdl
-   testParameterFiles:
-    - empty.json
- - name: MashTree_FASTA
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_mashtree_fasta.wdl
-   testParameterFiles:
-    - empty.json
- - name: Mercury_Batch_CCPHL
-   subclass: WDL
-   primaryDescriptorPath: /workflows/wf_mercury_batch.wdl
    testParameterFiles:
     - empty.json
