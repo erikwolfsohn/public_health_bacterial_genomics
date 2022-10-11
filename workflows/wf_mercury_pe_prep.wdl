@@ -27,8 +27,8 @@ workflow mercury_pe_prep {
     String design_description = "MiSeq Nextera XT shotgun sequencing of cultured isolate"
     Int n50_value
     Float est_coverage
-    #Float campylobacter_min_coverage = 20
-    #Float salmonella_min_coverage = 30
+    Float campylobacter_min_coverage = 20
+    Float salmonella_min_coverage = 30
     #Float? min_coverage = 0
     String isolation_source
     # Optional Metadata
@@ -42,6 +42,8 @@ workflow mercury_pe_prep {
     input:
       sample_id = sample_id,
       organism = organism,
+      campylobacter_min_coverage = campylobacter_min_coverage,
+      salmonella_min_coverage = salmonella_min_coverage,
   }
 
   if (n50_value >= n50_value_threshold) {

@@ -10,16 +10,18 @@
       Int disk_size = 50
       Int preemptible = 0
       String organism
+      Float campylobacter_min_coverage
+      Float salmonella_min_coverage
     }
 
     command <<<
     SAMPLETYPE=$(echo ~{organism} | sed 's/ .*//')
     if [ "$SAMPLETYPE" == "Salmonella" ]
     then
-      MIN_COV="30"
+      MIN_COV="~{salmonella_min_coverage}"
     elif [ "$SAMPLETYPE" == "Campylobacter" ]
     then
-      MIN_COV="20"
+      MIN_COV="~{campylobacter_min_coverage}"
     else
       MIN_COV="1000"
     fi
