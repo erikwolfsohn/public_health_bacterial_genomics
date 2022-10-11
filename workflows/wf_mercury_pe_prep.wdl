@@ -2,6 +2,7 @@ version 1.0
 
 import "../tasks/task_versioning.wdl" as versioning
 import "../tasks/task_pub_repo_prep.wdl" as submission_prep
+import "../tasks/task_checktype.wdl" as checktype
 
 workflow mercury_pe_prep {
   input {
@@ -26,6 +27,10 @@ workflow mercury_pe_prep {
     String design_description = "MiSeq Nextera XT shotgun sequencing of cultured isolate"
     Int n50_value
     Float est_coverage
+    #Float campylobacter_min_coverage = 20
+    #Float salmonella_min_coverage = 30
+    #Float? min_coverage = 0
+    String isolation_source
     # Optional Metadata
     String? biosample_accession
     String? serovar
@@ -33,78 +38,108 @@ workflow mercury_pe_prep {
     Int n50_value_threshold = 25000
   }
 
-  command <<<
-  if (echo ~{sample_id} | grep -i -- "-S";)
-    then
-      SAMPLETYPE="SALMONELLA"
-    elif (echo ~{sample_id} | grep -i -- "-C";)
-    then
-      SAMPLETYPE="CAMPYLOBACTER"
-    else
-      SAMPLETYPE="error"
-    fi
+  #command <<<
+  #if (echo ~{sample_id} | grep -i -- "-S";)
+  #  then
+  #    SAMPLETYPE="SALMONELLA"
+  #  elif (echo ~{sample_id} | grep -i -- "-C";)
+  #  then
+  #    SAMPLETYPE="CAMPYLOBACTER"
+  #  else
+  #    SAMPLETYPE="error"
+  #  fi
 
-    echo -e "${SAMPLETYPE}" > ~{sample_id}_sampletype.txt
-  >>>
+  #  echo -e "${SAMPLETYPE}" > ~{sample_id}_sampletype.txt
+  #>>>
 
-  String sample_type = read_string(~{sample_id}_sampletype.txt)
+  call checktype.checktype {
+    input:
+      sample_id = sample_id,
+      #organism = organism,
+  }
 
   if (n50_value >= n50_value_threshold) {
-    if (sample_type == "SALMONELLA") {
-      if (est_coverage >= 30) {
-    call submission_prep.ncbi_prep_one_sample {
-      input:
-        biosample_accession = biosample_accession,
-        filetype = filetype,
-        instrument_model = instrument_model,
-        library_layout = library_layout,
-        library_selection = library_selection,
-        library_source = library_source,
-        library_strategy = library_strategy,
-        organism = organism,
-        serovar = serovar,
-        read1 = read1,
-        read2 = read2,
-        seq_platform = seq_platform,
-        sample_id = sample_id,
-        geo_loc_name = geo_loc_name,
-        lat_lon = lat_lon,
-        county_id = county_id,
-        design_description = design_description,
-
-        }
+    if (est_coverage >= checktype.min_coverage) {
+      call submission_prep.ncbi_prep_one_sample {
+        input:
+          biosample_accession = biosample_accession,
+          filetype = filetype,
+          instrument_model = instrument_model,
+          library_layout = library_layout,
+          library_selection = library_selection,
+          library_source = library_source,
+          library_strategy = library_strategy,
+          organism = organism,
+          serovar = serovar,
+          read1 = read1,
+          read2 = read2,
+          seq_platform = seq_platform,
+          sample_id = sample_id,
+          geo_loc_name = geo_loc_name,
+          lat_lon = lat_lon,
+          county_id = county_id,
+          design_description = design_description,
+          isolation_source = isolation_source,
       }
     }
   }
+ 
+  #  if (n50_value >= n50_value_threshold) {
+  #  if (checktype.sample_type == "Salmonella") {
+  #    if (est_coverage >= 30) {
+  #  call submission_prep.ncbi_prep_one_sample as salm {
+  #    input:
+  #      biosample_accession = biosample_accession,
+  #      filetype = filetype,
+  #      instrument_model = instrument_model,
+  #      library_layout = library_layout,
+  #      library_selection = library_selection,
+  #      library_source = library_source,
+  #      library_strategy = library_strategy,
+  #      organism = organism,
+  #      serovar = serovar,
+  #      read1 = read1,
+  #      read2 = read2,
+  #      seq_platform = seq_platform,
+  #      sample_id = sample_id,
+  #      geo_loc_name = geo_loc_name,
+  #      lat_lon = lat_lon,
+  #      county_id = county_id,
+  #      design_description = design_description,
+  #
+  #      }
+  #    }
+  #  }
+  #}
+  #
+  #  if (n50_value >= n50_value_threshold) {
+  #  if (checktype.sample_type == "Campylobacter") {
+  #    if (est_coverage >= 25) {
+  #  call submission_prep.ncbi_prep_one_sample {
+  #    input:
+  #      biosample_accession = biosample_accession,
+  #      filetype = filetype,
+  #      instrument_model = instrument_model,
+  #      library_layout = library_layout,
+  #      library_selection = library_selection,
+  #      library_source = library_source,
+  #      library_strategy = library_strategy,
+  #      organism = organism,
+  #      serovar = serovar,
+  #      read1 = read1,
+  #      read2 = read2,
+  #      seq_platform = seq_platform,
+  #      sample_id = sample_id,
+  #      geo_loc_name = geo_loc_name,
+  #      lat_lon = lat_lon,
+  #      county_id = county_id,
+  #      design_description = design_description,
+  #
+  #      }
+  #    }
+  #  }
+  #}
 
-    if (n50_value >= n50_value_threshold) {
-    if (sample_type == "CAMPYLOBACTER") {
-      if (est_coverage >= 25) {
-    call submission_prep.ncbi_prep_one_sample {
-      input:
-        biosample_accession = biosample_accession,
-        filetype = filetype,
-        instrument_model = instrument_model,
-        library_layout = library_layout,
-        library_selection = library_selection,
-        library_source = library_source,
-        library_strategy = library_strategy,
-        organism = organism,
-        serovar = serovar,
-        read1 = read1,
-        read2 = read2,
-        seq_platform = seq_platform,
-        sample_id = sample_id,
-        geo_loc_name = geo_loc_name,
-        lat_lon = lat_lon,
-        county_id = county_id,
-        design_description = design_description,
-
-        }
-      }
-    }
-  }
-  
   call versioning.version_capture{
     input:
   }
