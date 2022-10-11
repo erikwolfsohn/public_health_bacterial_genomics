@@ -33,10 +33,11 @@ task ncbi_prep_one_sample {
   }
 
   command <<<
-    if (echo ~{sample_id} | grep -i -- "-S";)
+    SAMPLETYPE=$(echo ~{organism} | sed 's/ .*//')
+    if [ "$SAMPLETYPE" == "Salmonella" ]
     then
       BIOPROJECT_ACCESSION="PRJNA292661"
-    elif (echo ~{sample_id} | grep -i -- "-C";)
+    elif [ "$SAMPLETYPE" == "Campylobacter" ]
     then
       BIOPROJECT_ACCESSION="PRJNA292664"
     else

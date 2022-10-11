@@ -4,14 +4,20 @@
     
     input {
       String sample_id
-      #String organism
+      String docker = "quay.io/theiagen/utility:1.1"
+      Int memory = 8
+      Int cpu = 2
+      Int disk_size = 50
+      Int preemptible = 0
+      String organism
     }
 
     command <<<
-    if (echo ~{sample_id} | grep -i -- "-S";)
+    SAMPLETYPE=$(echo ~{organism} | sed 's/ .*//')
+    if [ "$SAMPLETYPE" == "Salmonella" ]
     then
       MIN_COV="30"
-    elif (echo ~{sample_id} | grep -i -- "-C";)
+    elif [ "$SAMPLETYPE" == "Campylobacter" ]
     then
       MIN_COV="20"
     else
@@ -26,4 +32,13 @@
       Float min_coverage = read_float("~{sample_id}_min_coverage.txt")
     }
 
+    runtime {
+    docker: docker
+    memory: "~{memory} GB"
+    cpu: cpu
+    disks: "local-disk ~{disk_size} SSD"
+    preemptible: preemptible
+    maxRetries: 3
   }
+
+}

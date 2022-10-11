@@ -41,7 +41,7 @@ workflow mercury_pe_prep {
   call checktype.checktype {
     input:
       sample_id = sample_id,
-      #organism = organism,
+      organism = organism,
   }
 
   if (n50_value >= n50_value_threshold) {
@@ -73,8 +73,10 @@ workflow mercury_pe_prep {
   call versioning.version_capture{
     input:
   }
+
   output {
     # Version Capture
+    Float min_coverage = checktype.min_coverage
     String mercury_pe_prep_version = version_capture.phbg_version
     String mercury_pe_prep_analysis_date = version_capture.date
     # NCBI Submission Files
