@@ -68,6 +68,8 @@ task ncbi_prep_one_sample {
 
     COLLECTION_DATE=($(echo ~{sample_id} | grep -o '[0-9]\+' | tr -d '\n' | head -c 4))
     COLLECTION_DATE=($(echo 20${COLLECTION_DATE:0:2}-${COLLECTION_DATE:2:4}))
+
+    LIBRARY_ID=($(echo ~{sample_id}-001))
     
 
     echo -e "*sample_name\tsample_title\tbioproject_accession\t*organism\tstrain\tisolate\t*collected_by\t*collection_date\t*geo_loc_name\t*isolation_source\t*lat_lon\tculture_collection\tgenotype\tpassage_history\tpathotype\tserotype\tserovar\tsubgroup\tsubtype\tdescription" > ~{sample_id}_biosample_attributes.tsv    
@@ -79,8 +81,8 @@ task ncbi_prep_one_sample {
     echo -e "bioproject_accession\tsample_name\tlibrary_ID\ttitle\tlibrary_strategy\tlibrary_source\tlibrary_selection\tlibrary_layout\tplatform\tinstrument_model\tdesign_description\tfiletype\tfilename\tfilename2\tfilename3\tfilename4\tassembly\tfasta_file" > ~{sample_id}_sra_metadata.tsv    
     echo -e "${BIOPROJECT_ACCESSION}\t~{sample_id}\t~{sample_id}\tWGS of ~{organism}: ${COLLECTION_DATE:0:4} NARMS ~{isolation_source} ~{sample_id}\t~{library_strategy}\t~{library_source}\t~{library_selection}\t~{library_layout}\t~{seq_platform}\t~{instrument_model}\t~{design_description}\t~{filetype}\t~{sample_id}_R1.fastq.gz\t~{sample_id}_R2.fastq.gz\t\t\t\t" >> ~{sample_id}_sra_metadata.tsv
 
-    echo -e "host\thost_disease" > ~{sample_id}_misc.tsv
-    echo -e "${HOST}\t${HOST_DISEASE}" >> ~{sample_id}_misc.tsv
+    echo -e "host\thost_disease\tlibrary_ID" > ~{sample_id}_misc.tsv
+    echo -e "${HOST}\t${HOST_DISEASE}\t${LIBRARY_ID}" >> ~{sample_id}_misc.tsv
 
     python3 <<CODE
     import csv
@@ -116,6 +118,9 @@ task ncbi_prep_one_sample {
       with open ("HOST_DISEASE", 'wt') as host_disease:
         sample_host_disease=tsv_dict['host_disease']
         host_disease.write(sample_host_disease)
+      with open ("LIBRARY_ID", 'wt') as library_ID:
+        sample_library_ID=tsv_dict['library_ID']
+        library_ID.write(sample_library_ID)
     CODE
   >>>
   output {
