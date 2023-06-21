@@ -10,21 +10,22 @@ workflow mercury_pe_prep {
     File read1
     File read2
     # Required Metadata (TheiaCoV GC Outputs)
-    String sample_id
+    String input_sample_id
     # Required Metadata (User Inputs)
     #String collection_date
-    String filetype = "fastq"
-    String instrument_model = "Illumina MiSeq"
-    String library_layout = "paired"
-    String library_selection = "RANDOM"
-    String library_source = "GENOMIC"
-    String library_strategy = "WGS"
-    String organism
-    String seq_platform = "ILLUMINA"
-    String geo_loc_name = "USA:CA"
-    String lat_lon = "missing"
-    String county_id = "CA-Contra Costa"
-    String design_description = "MiSeq Nextera XT shotgun sequencing of cultured isolate"
+    String input_filetype = "fastq"
+    String input_instrument_model = "Illumina MiSeq"
+    String input_library_layout = "paired"
+    String input_library_selection = "RANDOM"
+    String input_library_source = "GENOMIC"
+    String input_library_strategy = "WGS"
+    String input_organism
+    String input_seq_platform = "ILLUMINA"
+    String input_geo_loc_name = "USA:CA"
+    String input_lat_lon = "missing"
+    String input_isolation_type = "Environmental"
+    String input_county_id = "CA-Contra Costa"
+    String input_design_description = "MiSeq Nextera XT shotgun sequencing of cultured isolate"
     Int n50_value
     Float est_coverage
     Float campylobacter_min_coverage = 20
@@ -33,15 +34,15 @@ workflow mercury_pe_prep {
     String isolation_source
     # Optional Metadata
     String? biosample_accession
-    String? serovar
+    String? input_serovar
     # Optional User-Defined Thresholds for Generating Submission Files
     Int n50_value_threshold = 25000
   }
 
   call checktype.checktype {
     input:
-      sample_id = sample_id,
-      organism = organism,
+      sample_id = input_sample_id,
+      organism = input_organism,
       campylobacter_min_coverage = campylobacter_min_coverage,
       salmonella_min_coverage = salmonella_min_coverage,
   }
@@ -51,22 +52,22 @@ workflow mercury_pe_prep {
       call submission_prep.ncbi_prep_one_sample {
         input:
           biosample_accession = biosample_accession,
-          filetype = filetype,
-          instrument_model = instrument_model,
-          library_layout = library_layout,
-          library_selection = library_selection,
-          library_source = library_source,
-          library_strategy = library_strategy,
-          organism = organism,
-          serovar = serovar,
+          filetype = input_filetype,
+          instrument_model = input_instrument_model,
+          library_layout = input_library_layout,
+          library_selection = input_library_selection,
+          library_source = input_library_source,
+          library_strategy = input_library_strategy,
+          organism = input_organism,
+          serovar = input_serovar,
           read1 = read1,
           read2 = read2,
-          seq_platform = seq_platform,
-          sample_id = sample_id,
-          geo_loc_name = geo_loc_name,
-          lat_lon = lat_lon,
-          county_id = county_id,
-          design_description = design_description,
+          seq_platform = input_seq_platform,
+          sample_id = input_sample_id,
+          geo_loc_name = input_geo_loc_name,
+          lat_lon = input_lat_lon,
+          county_id = input_county_id,
+          design_description = input_design_description,
           isolation_source = isolation_source,
       }
     }
@@ -87,5 +88,26 @@ workflow mercury_pe_prep {
     File? sra_read1 = ncbi_prep_one_sample.sra_read1
     File? sra_read2 = ncbi_prep_one_sample.sra_read2
     Array[File]? sra_reads = ncbi_prep_one_sample.sra_reads
+    String? bioproject_accession = ncbi_prep_one_sample.bioproject_accession
+    String? title = ncbi_prep_one_sample.title
+    String? collection_date = ncbi_prep_one_sample.collection_date
+    String? host = ncbi_prep_one_sample.host
+    String? host_disease = ncbi_prep_one_sample.host_disease
+    String? library_strategy = "~{input_library_strategy}"
+    String? library_source = "~{input_library_source}"
+    String? library_selection = "~{input_library_selection}"
+    String? library_layout = "~{input_library_layout}"
+    String? platform = "~{input_seq_platform}"
+    String? instrument_model = "~{input_instrument_model}"
+    String? design_description = "~{input_design_description}"
+    String? filetype = "~{input_filetype}"
+    String? submission_id = "~{input_sample_id}"
+    String? organism = "~{input_organism}"
+    String? collected_by = "~{input_county_id}"
+    String? geo_loc_name = "~{input_geo_loc_name}"
+    String? lat_lon = "~{input_lat_lon}"
+    String? isolation_type = "~{input_isolation_type}"
+    String? strain = "~{input_sample_id}"
+    String? serovar = "~{input_serovar}"
   }
 }

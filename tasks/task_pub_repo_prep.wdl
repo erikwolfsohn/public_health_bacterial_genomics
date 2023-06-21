@@ -33,13 +33,31 @@ task ncbi_prep_one_sample {
   }
 
   command <<<
+    if (echo ~{sample_id} | grep -i "GB";)
+    then
+      HOST="Cow"
+    elif (echo ~{sample_id} | grep -i "CB";)
+    then
+      HOST="Chicken"
+    elif (echo ~{sample_id} | grep -i "GT";)
+    then
+      HOST="Turkey"
+    elif (echo ~{sample_id} | grep -i "PC";)
+    then
+      HOST="Pig"
+    else
+      HOST="error"
+    fi
+
     SAMPLETYPE=$(echo ~{organism} | sed 's/ .*//')
     if [ "$SAMPLETYPE" == "Salmonella" ]
     then
       BIOPROJECT_ACCESSION="PRJNA292661"
+      HOST_DISEASE = "Salmonellosis"
     elif [ "$SAMPLETYPE" == "Campylobacter" ]
     then
       BIOPROJECT_ACCESSION="PRJNA292664"
+      HOST_DISEASE = "Campylobacteriosis"
     else
       BIOPROJECT_ACCESSION="error"
     fi
@@ -56,6 +74,45 @@ task ncbi_prep_one_sample {
 
     echo -e "bioproject_accession\tsample_name\tlibrary_ID\ttitle\tlibrary_strategy\tlibrary_source\tlibrary_selection\tlibrary_layout\tplatform\tinstrument_model\tdesign_description\tfiletype\tfilename\tfilename2\tfilename3\tfilename4\tassembly\tfasta_file" > ~{sample_id}_sra_metadata.tsv    
     echo -e "${BIOPROJECT_ACCESSION}\t~{sample_id}\t~{sample_id}\tWGS of ~{organism}: ${COLLECTION_DATE:0:4} NARMS ~{isolation_source} ~{sample_id}\t~{library_strategy}\t~{library_source}\t~{library_selection}\t~{library_layout}\t~{seq_platform}\t~{instrument_model}\t~{design_description}\t~{filetype}\t~{sample_id}_R1.fastq.gz\t~{sample_id}_R2.fastq.gz\t\t\t\t" >> ~{sample_id}_sra_metadata.tsv
+
+    echo -e "host \thost_disease" > ~{sample_id}_misc.tsv
+    echo -e "${HOST}\t${HOST_DISEASE}" >> ~{sample_id}_misc.tsv
+
+    python3 <<CODE
+    import csv
+
+    with open("./~{sample_id}_sra_metadata.tsv") as tsv_file
+      tsv_reader=csv.reader(tsv_file, delimiter="\t")
+      tsv_data=list(tsv_reader)
+      tsv_dict=dict(zip(tsv_data[0], tsv_data[1]))
+      with open ("BIOPROJECT_ACCESSION", 'wt') as bioproject_accession:
+        sample_bioproject_accession=tsv_dict['bioproject_accession']
+        bioproject_accession.write(sample_bioproject_accession)
+      with open ("TITLE", 'wt') as title:
+        sample_title=tsv_dict['title']
+        title.write(sample_title)
+      
+
+    with open("~{sample_id}_biosample_attributes.tsv") as tsv_file
+      tsv_reader=csv.reader(tsv_file, delimiter="\t")
+      tsv_data=list(tsv_reader)
+      tsv_dict=dict(zip(tsv_data[0], tsv_data[1]))
+      with open ("COLLECTION_DATE", 'wt') as collection_date:
+        sample_collection_date=tsv_dict['collection_date']
+        collection_date.write(sample_collection_date)
+
+
+    with open("~{sample_id}_misc.tsv") as tsv_file
+      tsv_reader=csv.reader(tsv_file, delimiter="\t")
+      tsv_data=list(tsv_reader)
+      tsv_dict=dict(zip(tsv_data[0], tsv_data[1]))
+      with open ("HOST", 'wt') as host:
+        sample_host=tsv_dict['host']
+        host.write(sample_host)
+      with open ("HOST_DISEASE", 'wt') as host_disease:
+        sample_host_disease=tsv_dict['host_disease']
+        host_disease.write(sample_host_disease)
+    CODE
   >>>
   output {
     File biosample_attributes = "~{sample_id}_biosample_attributes.tsv"
@@ -63,6 +120,11 @@ task ncbi_prep_one_sample {
     File sra_read1 = "~{sample_id}_R1.fastq.gz"
     File sra_read2 = "~{sample_id}_R2.fastq.gz"
     Array[File] sra_reads = ["~{sample_id}_R1.fastq.gz","~{sample_id}_R2.fastq.gz"]
+    String bioproject_accession = read_string("BIOPROJECT_ACCESSION")
+    String title = read_string("TITLE")
+    String collection_date = read_string("COLLECTION_DATE")
+    String host = read_string("HOST")
+    String host_disease = read_string("HOST_DISEASE")
   }
   runtime {
     docker: "~{docker_image}"
