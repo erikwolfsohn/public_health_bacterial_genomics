@@ -25,7 +25,7 @@ task ncbi_prep_one_sample {
     String? serovar
     String? biosample_accession = "{populate_with_bioSample_accession}"
     #runtime
-    String docker_image = "quay.io/staphb/vadr:1.3"
+    String docker_image
     Int  memory = 1
     Int cpu = 1
     Int disk_size = 25

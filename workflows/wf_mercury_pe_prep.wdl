@@ -27,6 +27,7 @@ workflow mercury_pe_prep {
     String input_county_id = "CA-Contra Costa"
     String input_design_description = "MiSeq Nextera XT shotgun sequencing of cultured isolate"
     Int n50_value
+    String submission_prep_docker = "quay.io/theiagen/terra-tools:2023-03-16"
     Float est_coverage
     Float campylobacter_min_coverage = 20
     Float salmonella_min_coverage = 30
@@ -69,6 +70,7 @@ workflow mercury_pe_prep {
           county_id = input_county_id,
           design_description = input_design_description,
           isolation_source = isolation_source,
+          docker_image = submission_prep_docker
       }
     }
   }
