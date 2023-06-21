@@ -39,6 +39,9 @@ task ncbi_prep_one_sample {
     elif (echo ~{sample_id} | grep -i "CB";)
     then
       HOST="Chicken"
+    elif (echo ~{sample_id} | grep -i "CG";)
+    then
+      HOST="Chicken"
     elif (echo ~{sample_id} | grep -i "GT";)
     then
       HOST="Turkey"
@@ -50,16 +53,17 @@ task ncbi_prep_one_sample {
     fi
 
     SAMPLETYPE=$(echo ~{organism} | sed 's/ .*//')
-    if [ "$SAMPLETYPE" == "Salmonella" ]
+    if [ "$SAMPLETYPE" == "Salmonella" ];
     then
       BIOPROJECT_ACCESSION="PRJNA292661"
-      HOST_DISEASE = "Salmonellosis"
-    elif [ "$SAMPLETYPE" == "Campylobacter" ]
+      HOST_DISEASE="Salmonellosis"
+    elif [ "$SAMPLETYPE" == "Campylobacter" ];
     then
       BIOPROJECT_ACCESSION="PRJNA292664"
-      HOST_DISEASE = "Campylobacteriosis"
+      HOST_DISEASE="Campylobacteriosis"
     else
       BIOPROJECT_ACCESSION="error"
+      HOST_DISEASE="error"
     fi
 
     COLLECTION_DATE=($(echo ~{sample_id} | grep -o '[0-9]\+' | tr -d '\n' | head -c 4))
@@ -75,13 +79,13 @@ task ncbi_prep_one_sample {
     echo -e "bioproject_accession\tsample_name\tlibrary_ID\ttitle\tlibrary_strategy\tlibrary_source\tlibrary_selection\tlibrary_layout\tplatform\tinstrument_model\tdesign_description\tfiletype\tfilename\tfilename2\tfilename3\tfilename4\tassembly\tfasta_file" > ~{sample_id}_sra_metadata.tsv    
     echo -e "${BIOPROJECT_ACCESSION}\t~{sample_id}\t~{sample_id}\tWGS of ~{organism}: ${COLLECTION_DATE:0:4} NARMS ~{isolation_source} ~{sample_id}\t~{library_strategy}\t~{library_source}\t~{library_selection}\t~{library_layout}\t~{seq_platform}\t~{instrument_model}\t~{design_description}\t~{filetype}\t~{sample_id}_R1.fastq.gz\t~{sample_id}_R2.fastq.gz\t\t\t\t" >> ~{sample_id}_sra_metadata.tsv
 
-    echo -e "host \thost_disease" > ~{sample_id}_misc.tsv
+    echo -e "host\thost_disease" > ~{sample_id}_misc.tsv
     echo -e "${HOST}\t${HOST_DISEASE}" >> ~{sample_id}_misc.tsv
 
     python3 <<CODE
     import csv
 
-    with open("./~{sample_id}_sra_metadata.tsv") as tsv_file
+    with open("./~{sample_id}_sra_metadata.tsv",'r') as tsv_file:
       tsv_reader=csv.reader(tsv_file, delimiter="\t")
       tsv_data=list(tsv_reader)
       tsv_dict=dict(zip(tsv_data[0], tsv_data[1]))
@@ -93,16 +97,16 @@ task ncbi_prep_one_sample {
         title.write(sample_title)
       
 
-    with open("~{sample_id}_biosample_attributes.tsv") as tsv_file
+    with open("~{sample_id}_biosample_attributes.tsv",'r') as tsv_file:
       tsv_reader=csv.reader(tsv_file, delimiter="\t")
       tsv_data=list(tsv_reader)
       tsv_dict=dict(zip(tsv_data[0], tsv_data[1]))
       with open ("COLLECTION_DATE", 'wt') as collection_date:
-        sample_collection_date=tsv_dict['collection_date']
+        sample_collection_date=tsv_dict['*collection_date']
         collection_date.write(sample_collection_date)
 
 
-    with open("~{sample_id}_misc.tsv") as tsv_file
+    with open("~{sample_id}_misc.tsv",'r') as tsv_file:
       tsv_reader=csv.reader(tsv_file, delimiter="\t")
       tsv_data=list(tsv_reader)
       tsv_dict=dict(zip(tsv_data[0], tsv_data[1]))
@@ -132,7 +136,7 @@ task ncbi_prep_one_sample {
     cpu: cpu
     disks: "local-disk ~{disk_size} SSD"
     preemptible: preemptible_tries
-    maxRetries: 3
+    maxRetries: 0
   }
 }
 

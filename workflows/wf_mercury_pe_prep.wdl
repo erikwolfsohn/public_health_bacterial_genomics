@@ -8,7 +8,7 @@ workflow mercury_pe_prep {
   input {
     # Required Files
     File read1
-    File read2
+    File read2 
     # Required Metadata (TheiaCoV GC Outputs)
     String input_sample_id
     # Required Metadata (User Inputs)
