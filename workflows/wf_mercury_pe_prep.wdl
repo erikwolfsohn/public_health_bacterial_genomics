@@ -95,6 +95,7 @@ workflow mercury_pe_prep {
     String? collection_date = ncbi_prep_one_sample.collection_date
     String? host = ncbi_prep_one_sample.host
     String? host_disease = ncbi_prep_one_sample.host_disease
+    String? library_ID = ncbi_prep_one_sample.library_ID
     String? library_strategy = "~{input_library_strategy}"
     String? library_source = "~{input_library_source}"
     String? library_selection = "~{input_library_selection}"

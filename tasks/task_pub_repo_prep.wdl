@@ -134,6 +134,7 @@ task ncbi_prep_one_sample {
     String collection_date = read_string("COLLECTION_DATE")
     String host = read_string("HOST")
     String host_disease = read_string("HOST_DISEASE")
+    String library_ID = read_string("LIBRARY_ID")
   }
   runtime {
     docker: "~{docker_image}"
